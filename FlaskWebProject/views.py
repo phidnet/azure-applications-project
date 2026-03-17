@@ -13,7 +13,9 @@ from FlaskWebProject.models import User, Post
 import msal
 import uuid
 
+
 imageSourceUrl = 'https://'+ app.config['BLOB_ACCOUNT']  + '.blob.core.windows.net/' + app.config['BLOB_CONTAINER']  + '/'
+
 
 @app.route('/')
 @app.route('/home')
@@ -26,6 +28,7 @@ def home():
         title='Home Page',
         posts=posts
     )
+
 
 @app.route('/new_post', methods=['GET', 'POST'])
 @login_required
@@ -58,6 +61,7 @@ def post(id):
         form=form
     )
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -67,8 +71,10 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
+            app.logger.debug(f"Invalid login attempt")
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
+        app.logger.debug(f"Admin logged in successfully")
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('home')
@@ -76,6 +82,7 @@ def login():
     session["state"] = str(uuid.uuid4())
     auth_url = _build_auth_url(scopes=Config.SCOPE, state=session["state"])
     return render_template('login.html', title='Sign In', form=form, auth_url=auth_url)
+
 
 @app.route(Config.REDIRECT_PATH)  # Its absolute URL must match your app's redirect_uri set in AAD
 def authorized():
@@ -86,7 +93,7 @@ def authorized():
 
     if request.args.get('code'):
         cache = _load_cache()
-        # TODO: Acquire a token from a built msal app, along with the appropriate redirect URI
+        # Acquire a token from a built msal app, along with the appropriate redirect URI
         result = _build_msal_app(cache=cache).acquire_token_by_authorization_code(
             request.args['code'],
             scopes=Config.SCOPE,
@@ -102,6 +109,7 @@ def authorized():
         _save_cache(cache)
     return redirect(url_for('home'))
 
+
 @app.route('/logout')
 def logout():
     logout_user()
@@ -115,6 +123,7 @@ def logout():
 
     return redirect(url_for('login'))
 
+
 def _load_cache():
     """
     Load the cache from `msal`, if it exists
@@ -124,9 +133,11 @@ def _load_cache():
         cache.deserialize(session["token_cache"])
     return cache
 
+
 def _save_cache(cache):
     if cache.has_state_changed:
         session['token_cache'] = cache.serialize()
+
 
 def _build_msal_app(cache=None, authority=None):
     """
@@ -138,6 +149,7 @@ def _build_msal_app(cache=None, authority=None):
         client_credential=app.config['CLIENT_SECRET'],
         token_cache=cache
     )
+
 
 def _build_auth_url(authority=None, scopes=None, state=None):
     """

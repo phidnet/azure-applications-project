@@ -12,12 +12,12 @@ from flask_session import Session
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.logger.setLevel(logging.DEBUG)
+app.logger.setLevel(logging.INFO)
 streamHandler = logging.StreamHandler()
-streamHandler.setLevel(logging.DEBUG)
+streamHandler.setLevel(logging.INFO)
 app.logger.addHandler(streamHandler)
 
-app.logger.debug(f"SQL_SERVER: {os.environ.get('SQL_SERVER')}")
+# app.logger.debug(f"SQL_SERVER: {os.environ.get('SQL_SERVER')}")
 
 Session(app)
 db = SQLAlchemy(app)

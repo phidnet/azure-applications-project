@@ -10,8 +10,10 @@ from flask import flash
 blob_container = app.config['BLOB_CONTAINER']
 blob_service = BlockBlobService(account_name=app.config['BLOB_ACCOUNT'], account_key=app.config['BLOB_STORAGE_KEY'])
 
+
 def id_generator(size=32, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -28,9 +30,11 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
 
 class Post(db.Model):
     __tablename__ = 'posts'
