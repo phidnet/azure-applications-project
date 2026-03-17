@@ -14,7 +14,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 app.logger.setLevel(logging.INFO)
 streamHandler = logging.StreamHandler()
-streamHandler.setLevel(logging.INFO)
+streamHandler.setLevel(logging.WARNING)
 app.logger.addHandler(streamHandler)
 
 # app.logger.debug(f"SQL_SERVER: {os.environ.get('SQL_SERVER')}")
