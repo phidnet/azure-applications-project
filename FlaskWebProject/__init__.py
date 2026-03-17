@@ -2,6 +2,8 @@
 The flask application package.
 """
 import logging
+import os
+
 from flask import Flask
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
@@ -10,7 +12,11 @@ from flask_session import Session
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
 # TODO: Add any logging levels and handlers with app.logger
+app.logger.setLevel(logging.DEBUG)
+app.logger.debug(f"SQL_SERVER: {os.environ.get('SQL_SERVER')}")
+
 Session(app)
 db = SQLAlchemy(app)
 login = LoginManager(app)
